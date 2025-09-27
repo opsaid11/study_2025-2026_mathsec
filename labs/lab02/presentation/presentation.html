@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+	<title></title>
+	<meta name="generator" content="LibreOffice 24.8.0.3 (Linux)"/>
+	<meta name="created" content="00:00:00"/>
+	<meta name="changed" content="00:00:00"/>
+	<style type="text/css">
+		@page { size: 8.27in 11.69in; margin: 0.79in }
+		p { line-height: 115%; margin-bottom: 0.1in; background: transparent }
+		pre { background: transparent }
+		pre.western { font-family: "Liberation Mono", monospace; font-size: 10pt }
+		pre.cjk { font-family: "Noto Sans Mono CJK SC", monospace; font-size: 10pt }
+		pre.ctl { font-family: "Liberation Mono", monospace; font-size: 10pt }
+	</style>
+</head>
+<body lang="en-US" link="#000080" vlink="#800000" dir="ltr"><pre class="western">---
+lang: ru-RU
+title: &quot;Шифры перестановки — реализация на Julia&quot;
+author: [&quot;Степанов Иван Юрьевич&quot;]
+date: 2025-09-27
+toc: false
+slide_level: 2
+aspectratio: 169
+theme: default
+mainfont: Times New Roman
+---
+
+# Цель
+Показать, как работают три шифра перестановки, и как их запустить из командной строки Julia.
+
+# Состав работы
+1) Столбцовая перестановка (пароль задаёт порядок столбцов).  
+2) Решётка Флейснера (повороты 0/90/180/270°, блочная обработка).  
+3) Шифр Виженера (посимвольные сдвиги по ключу).
+
+# 1. Столбцовая перестановка — идея
+- Пишем текст по строкам в таблицу `rows × cols` (без пробелов).  
+- Сортируем буквы ключа; читаем столбцы в этом порядке.  
+- Если таблица не заполнилась — добавляем `_`.
+
+# 1. Столбцовая — запуск
+```
+julia route.jl &quot;this is a test message!&quot; water 4 5
+→ hamgses!iss_iteetsta
+```
+- Здесь ключ `water`, размер 4×5.  
+- Регистр/пунктуация сохраняются в том виде, как попали в таблицу.
+
+# 2. Решётка Флейснера — идея
+- Размер матрицы \(2k \times 2k\); дырки заданы в квадранте \(k \times k\).  
+- Четыре поворота на 90° дают покрытие всех \(4k^2\) позиций.  
+- Блоки текста длиной \(4k^2\) пакуются последовательно; при нехватке символов — паддинг.
+
+# 2. Решётка — запуск
+```
+julia rails.jl &quot;Hello, New World!&quot; keys 2
+→ ,lr!HNdwoeolle W
+```
+- Ключ `keys` сортирует столбцы.  
+- Для `k=2` размер блока \(4k^2 = 16\). При необходимости остаток дополняется.
+
+# 3. Виженер — идея
+- Алфавит по умолчанию: a–z (можно передать свой).  
+- Для каждой буквы текста используем индекс буквы ключа (ключ повторяется).  
+- Неалфавитные символы перепечатываются без изменений.
+
+# 3. Виженер — запуск
+```
+julia vigener.jl e &quot;hello world&quot; key
+→ rijvs uyvjn
+julia vigener.jl d &quot;rijvs uyvjn&quot; key
+→ hello world
+```
+
+# Практические замечания
+- Убедитесь, что длина текста подходит под параметры (rows×cols, 4k²).  
+- Для кириллицы в Виженере передайте алфавит: `&quot;абвгдежзийклмнопрстуфхцчшщъыьэюя&quot;`.  
+- Параметры можно подбирать для демонстрации эффектов перестановки.
+
+# Вывод
+Коды согласованы с примерами; запуск из консоли прост, параметры настраиваются через аргументы.</pre>
+</body>
+</html>
